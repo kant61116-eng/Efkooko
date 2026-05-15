@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏆 البطولة الأسطورية | 100 منتخب</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Cairo', sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 100%);
+            color: #f0f3fa;
+            min-height: 100vh;
+        }
+        /* شاشة التحميل الإجبارية 10 ميجا */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0f1e;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 2rem;
+            transition: opacity 0.5s;
+        }
+        .loader-container {
+            width: 80%;
+            max-width: 400px;
+            background: #1e2a3a;
+            border-radius: 30px;
+            padding: 4px;
+            box-shadow: 0 0 15px rgba(255,215,0,0.3);
+        }
+        .loader-bar {
+            height: 20px;
+            width: 0%;
+            background: linear-gradient(90deg, #F5B042, #FFD966);
+            border-radius: 30px;
+            transition: width 0.05s linear;
+        }
+        .loader-text {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #FFDE9C;
+        }
+        .loader-sub {
+            color: #aab3cf;
+        }
+        #main-content {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.6s;
+        }
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+        .hero {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #FFD966, #FFB347, #E6B422);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .hero p {
+            color: #aab3cf;
+            margin-top: 0.5rem;
+        }
+        .card {
+            background: rgba(20, 28, 44, 0.75);
+            backdrop-filter: blur(12px);
+            border-radius: 2rem;
+            border: 1px solid rgba(255, 200, 100, 0.2);
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.5);
+            overflow: hidden;
+        }
+        .card-header {
+            padding: 1.2rem 1.8rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid rgba(255, 215, 0, 0.25);
+            font-weight: 800;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .card-header i {
+            color: #F5B042;
+            font-size: 1.6rem;
+        }
+        .table-wrapper {
+            max-height: 450px;
+            overflow-y: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: right;
+        }
+        th, td {
+            padding: 0.9rem 1rem;
+            border-bottom: 1px solid rgba(255,255,240,0.08);
+        }
+        th {
+            background: rgba(0,0,0,0.4);
+            color: #FFDE9C;
+            position: sticky;
+            top: 0;
+        }
+        tr:hover td {
+            background: rgba(255, 200, 100, 0.08);
+        }
+        .rank {
+            font-weight: 800;
+            width: 60px;
+            color: #FFD966;
+        }
+        .points {
+            font-weight: 800;
+            color: #B9F6CA;
+            background: #1e2a3a;
+            padding: 0.2rem 0.6rem;
+            border-radius: 40px;
+            display: inline-block;
+        }
+        .telegram-card {
+            background: linear-gradient(145deg, #1f2a3e, #16212e);
+            border-radius: 1.5rem;
+            padding: 1rem 1.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            border: 1px solid #2b3b4e;
+            margin-bottom: 2rem;
+        }
+        .telegram-link {
+            background: #0088cc;
+            padding: 0.6rem 1.5rem;
+            border-radius: 3rem;
+            color: white;
+            text-decoration: none;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .telegram-link:hover {
+            background: #0077b3;
+            transform: scale(1.02);
+        }
+        .grid-2cols {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        footer {
+            margin-top: 3rem;
+            text-align: center;
+            color: #6c7a9e;
+        }
+        @media (max-width: 760px) {
+            .container { padding: 1rem; }
+            .grid-2cols { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- شاشة تحميل 10 ميجا إجبارية -->
+<div id="loading-screen">
+    <div style="text-align: center;">
+        <i class="fas fa-download fa-3x" style="color:#F5B042;"></i>
+        <div class="loader-text">جاري تحميل بيانات البطولة</div>
+        <div class="loader-sub">يتم تجهيز 10 ميجابايت من البيانات ...</div>
+    </div>
+    <div class="loader-container">
+        <div class="loader-bar" id="progress-bar"></div>
+    </div>
+    <div id="progress-percent" style="font-size:1.2rem;">0%</div>
+</div>
+
+<div id="main-content">
+    <div class="container">
+        <div class="hero">
+            <h1><i class="fas fa-trophy"></i> البطولة الأسطورية <i class="fas fa-futbol"></i></h1>
+            <p>أفضل 100 منتخب | ترتيب الهدافين</p>
+        </div>
+
+        <div class="telegram-card">
+            <div><i class="fab fa-telegram-plane fa-2x" style="color:#0088cc;"></i> <strong>انضم لقناتنا الرسمية</strong><br>آخر الأخبار والإحصائيات</div>
+            <a href="https://t.me/KOKO736K" target="_blank" class="telegram-link"><i class="fab fa-telegram"></i> Telegram قناة البطولة</a>
+        </div>
+
+        <div class="grid-2cols">
+            <!-- ليدربورد المنتخبات -->
+            <div class="card">
+                <div class="card-header"><i class="fas fa-ranking-star"></i> ترتيب المنتخبات (أفضل 100)</div>
+                <div class="table-wrapper">
+                    <table id="leaderboard-table">
+                        <thead><tr><th>#</th><th>المنتخب</th><th>النقاط</th></tr></thead>
+                        <tbody id="leaderboard-body"></tbody>
+                    </table>
+                </div>
+                <div style="padding:0.8rem 1.2rem"><i class="fas fa-globe-asia"></i> إجمالي المنتخبات: 100</div>
+            </div>
+
+            <!-- جدول الهدافين (اختياري) -->
+            <div class="card">
+                <div class="card-header"><i class="fas fa-medal"></i> ترتيب الهدافين (اللاعبون)</div>
+                <div class="table-wrapper">
+                    <table id="scorers-table">
+                        <thead><tr><th>#</th><th>اللاعب</th><th>المنتخب</th><th>الأهداف</th></tr></thead>
+                        <tbody id="scorers-body"></tbody>
+                    </table>
+                </div>
+                <div style="padding:0.8rem 1.2rem"><i class="fas fa-users"></i> إجمالي اللاعبين: <span id="total-players">0</span></div>
+            </div>
+        </div>
+        <footer>© 2025 البطولة الأسطورية | يمكنك تعديل البيانات من الكود (مصفوفات teams و players)</footer>
+    </div>
+</div>
+
+<script>
+    // ==========  البيانات الرئيسية - قم بتعديلها مباشرة هنا ==========
+    // ==========  100 منتخب - عدل الأسماء والنقاط كما تشاء  ==========
+    
+    let teams = [
+        // المنتخب رقم 1
+        { id: 1, name: "منتخب 1", points: 0 },   // اكتب هنا اسم المنتخب 1 | اكتب هنا عدد نقاط المنتخب 1
+        // المنتخب رقم 2
+        { id: 2, name: "منتخب 2", points: 0 },   // اكتب هنا اسم المنتخب 2 | اكتب هنا عدد نقاط المنتخب 2
+        // المنتخب رقم 3
+        { id: 3, name: "منتخب 3", points: 0 },   // اكتب هنا اسم المنتخب 3 | اكتب هنا عدد نقاط المنتخب 3
+        // المنتخب رقم 4
+        { id: 4, name: "منتخب 4", points: 0 },   // اكتب هنا اسم المنتخب 4 | اكتب هنا عدد نقاط المنتخب 4
+        // المنتخب رقم 5
+        { id: 5, name: "منتخب 5", points: 0 },   // اكتب هنا اسم المنتخب 5 | اكتب هنا عدد نقاط المنتخب 5
+        // المنتخب رقم 6
+        { id: 6, name: "منتخب 6", points: 0 },   // اكتب هنا اسم المنتخب 6 | اكتب هنا عدد نقاط المنتخب 6
+        // المنتخب رقم 7
+        { id: 7, name: "منتخب 7", points: 0 },   // اكتب هنا اسم المنتخب 7 | اكتب هنا عدد نقاط المنتخب 7
+        // المنتخب رقم 8
+        { id: 8, name: "منتخب 8", points: 0 },   // اكتب هنا اسم المنتخب 8 | اكتب هنا عدد نقاط المنتخب 8
+        // المنتخب رقم 9
+        { id: 9, name: "منتخب 9", points: 0 },   // اكتب هنا اسم المنتخب 9 | اكتب هنا عدد نقاط المنتخب 9
+        // المنتخب رقم 10
+        { id: 10, name: "منتخب 10", points: 0 }, // اكتب هنا اسم المنتخب 10 | اكتب هنا عدد نقاط المنتخب 10
+        // المنتخب رقم 11
+        { id: 11, name: "منتخب 11", points: 0 }, // اكتب هنا اسم المنتخب 11 | اكتب هنا عدد نقاط المنتخب 11
+        // المنتخب رقم 12
+        { id: 12, name: "منتخب 12", points: 0 }, // اكتب هنا اسم المنتخب 12 | اكتب هنا عدد نقاط المنتخب 12
+        // المنتخب رقم 13
+        { id: 13, name: "منتخب 13", points: 0 }, // اكتب هنا اسم المنتخب 13 | اكتب هنا عدد نقاط المنتخب 13
+        // المنتخب رقم 14
+        { id: 14, name: "منتخب 14", points: 0 }, // اكتب هنا اسم المنتخب 14 | اكتب هنا عدد نقاط المنتخب 14
+        // المنتخب رقم 15
+        { id: 15, name: "منتخب 15", points: 0 }, // اكتب هنا اسم المنتخب 15 | اكتب هنا عدد نقاط المنتخب 15
+        // المنتخب رقم 16
+        { id: 16, name: "منتخب 16", points: 0 }, // اكتب هنا اسم المنتخب 16 | اكتب هنا عدد نقاط المنتخب 16
+        // المنتخب رقم 17
+        { id: 17, name: "منتخب 17", points: 0 }, // اكتب هنا اسم المنتخب 17 | اكتب هنا عدد نقاط المنتخب 17
+        // المنتخب رقم 18
+        { id: 18, name: "منتخب 18", points: 0 }, // اكتب هنا اسم المنتخب 18 | اكتب هنا عدد نقاط المنتخب 18
+        // المنتخب رقم 19
+        { id: 19, name: "منتخب 19", points: 0 }, // اكتب هنا اسم المنتخب 19 | اكتب هنا عدد نقاط المنتخب 19
+        // المنتخب رقم 20
+        { id: 20, name: "منتخب 20", points: 0 }, // اكتب هنا اسم المنتخب 20 | اكتب هنا عدد نقاط المنتخب 20
+        // المنتخب رقم 21
+        { id: 21, name: "منتخب 21", points: 0 }, // اكتب هنا اسم المنتخب 21 | اكتب هنا عدد نقاط المنتخب 21
+        // المنتخب رقم 22
+        { id: 22, name: "منتخب 22", points: 0 }, // اكتب هنا اسم المنتخب 22 | اكتب هنا عدد نقاط المنتخب 22
+        // المنتخب رقم 23
+        { id: 23, name: "منتخب 23", points: 0 }, // اكتب هنا اسم المنتخب 23 | اكتب هنا عدد نقاط المنتخب 23
+        // المنتخب رقم 24
+        { id: 24, name: "منتخب 24", points: 0 }, // اكتب هنا اسم المنتخب 24 | اكتب هنا عدد نقاط المنتخب 24
+        // المنتخب رقم 25
+        { id: 25, name: "منتخب 25", points: 0 }, // اكتب هنا اسم المنتخب 25 | اكتب هنا عدد نقاط المنتخب 25
+        // المنتخب رقم 26
+        { id: 26, name: "منتخب 26", points: 0 }, // اكتب هنا اسم المنتخب 26 | اكتب هنا عدد نقاط المنتخب 26
+        // المنتخب رقم 27
+        { id: 27, name: "منتخب 27", points: 0 }, // اكتب هنا اسم المنتخب 27 | اكتب هنا عدد نقاط المنتخب 27
+        // المنتخب رقم 28
+        { id: 28, name: "منتخب 28", points: 0 }, // اكتب هنا اسم المنتخب 28 | اكتب هنا عدد نقاط المنتخب 28
+        // المنتخب رقم 29
+        { id: 29, name: "منتخب 29", points: 0 }, // اكتب هنا اسم المنتخب 29 | اكتب هنا عدد نقاط المنتخب 29
+        // المنتخب رقم 30
+        { id: 30, name: "منتخب 30", points: 0 }, // اكتب هنا اسم المنتخب 30 | اكتب هنا عدد نقاط المنتخب 30
+        // المنتخب رقم 31
+        { id: 31, name: "منتخب 31", points: 0 }, // اكتب هنا اسم المنتخب 31 | اكتب هنا عدد نقاط المنتخب 31
+        // المنتخب رقم 32
+        { id: 32, name: "منتخب 32", points: 0 }, // اكتب هنا اسم المنتخب 32 | اكتب هنا عدد نقاط المنتخب 32
+        // المنتخب رقم 33
+        { id: 33, name: "منتخب 33", points: 0 }, // اكتب هنا اسم المنتخب 33 | اكتب هنا عدد نقاط المنتخب 33
+        // المنتخب رقم 34
+        { id: 34, name: "منتخب 34", points: 0 }, // اكتب هنا اسم المنتخب 34 | اكتب هنا عدد نقاط المنتخب 34
+        // المنتخب رقم 35
+        { id: 35, name: "منتخب 35", points: 0 }, // اكتب هنا اسم المنتخب 35 | اكتب هنا عدد نقاط المنتخب 35
+        // المنتخب رقم 36
+        { id: 36, name: "منتخب 36", points: 0 }, // اكتب هنا اسم المنتخب 36 | اكتب هنا عدد نقاط المنتخب 36
+        // المنتخب رقم 37
+        { id: 37, name: "منتخب 37", points: 0 }, // اكتب هنا اسم المنتخب 37 | اكتب هنا عدد نقاط المنتخب 37
+        // المنتخب رقم 38
+        { id: 38, name: "منتخب 38", points: 0 }, // اكتب هنا اسم المنتخب 38 | اكتب هنا عدد نقاط المنتخب 38
+        // المنتخب رقم 39
+        { id: 39, name: "منتخب 39", points: 0 }, // اكتب هنا اسم المنتخب 39 | اكتب هنا عدد نقاط المنتخب 39
+        // المنتخب رقم 40
+        { id: 40, name: "منتخب 40", points: 0 }, // اكتب هنا اسم المنتخب 40 | اكتب هنا عدد نقاط المنتخب 40
+        // المنتخب رقم 41
+        { id: 41, name: "منتخب 41", points: 0 }, // اكتب هنا اسم المنتخب 41 | اكتب هنا عدد نقاط المنتخب 41
+        // المنتخب رقم 42
+        { id: 42, name: "منتخب 42", points: 0 }, // اكتب هنا اسم المنتخب 42 | اكتب هنا عدد نقاط المنتخب 42
+        // المنتخب رقم 43
+        { id: 43, name: "منتخب 43", points: 0 }, // اكتب هنا اسم المنتخب 43 | اكتب هنا عدد نقاط المنتخب 43
+        // المنتخب رقم 44
+        { id: 44, name: "منتخب 44", points: 0 }, // اكتب هنا اسم المنتخب 44 | اكتب هنا عدد نقاط المنتخب 44
+        // المنتخب رقم 45
+        { id: 45, name: "منتخب 45", points: 0 }, // اكتب هنا اسم المنتخب 45 | اكتب هنا عدد نقاط المنتخب 45
+        // المنتخب رقم 46
+        { id: 46, name: "منتخب 46", points: 0 }, // اكتب هنا اسم المنتخب 46 | اكتب هنا عدد نقاط المنتخب 46
+        // المنتخب رقم 47
+        { id: 47, name: "منتخب 47", points: 0 }, // اكتب هنا اسم المنتخب 47 | اكتب هنا عدد نقاط المنتخب 47
+        // المنتخب رقم 48
+        { id: 48, name: "منتخب 48", points: 0 }, // اكتب هنا اسم المنتخب 48 | اكتب هنا عدد نقاط المنتخب 48
+        // المنتخب رقم 49
+        { id: 49, name: "منتخب 49", points: 0 }, // اكتب هنا اسم المنتخب 49 | اكتب هنا عدد نقاط المنتخب 49
+        // المنتخب رقم 50
+        { id: 50, name: "منتخب 50", points: 0 }, // اكتب هنا اسم المنتخب 50 | اكتب هنا عدد نقاط المنتخب 50
+        // المنتخب رقم 51
+        { id: 51, name: "منتخب 51", points: 0 }, // اكتب هنا اسم المنتخب 51 | اكتب هنا عدد نقاط المنتخب 51
+        // المنتخب رقم 52
+        { id: 52, name: "منتخب 52", points: 0 }, // اكتب هنا اسم المنتخب 52 | اكتب هنا عدد نقاط المنتخب 52
+        // المنتخب رقم 53
+        { id: 53, name: "منتخب 53", points: 0 }, // اكتب هنا اسم المنتخب 53 | اكتب هنا عدد نقاط المنتخب 53
+        // المنتخب رقم 54
+        { id: 54, name: "منتخب 54", points: 0 }, // اكتب هنا اسم المنتخب 54 | اكتب هنا عدد نقاط المنتخب 54
+        // المنتخب رقم 55
+        { id: 55, name: "منتخب 55", points: 0 }, // اكتب هنا اسم المنتخب 55 | اكتب هنا عدد نقاط المنتخب 55
+        // المنتخب رقم 56
+        { id: 56, name: "منتخب 56", points: 0 }, // اكتب هنا اسم المنتخب 56 | اكتب هنا عدد نقاط المنتخب 56
+        // المنتخب رقم 57
+        { id: 57, name: "منتخب 57", points: 0 }, // اكتب هنا اسم المنتخب 57 | اكتب هنا عدد نقاط المنتخب 57
+        // المنتخب رقم 58
+        { id: 58, name: "منتخب 58", points: 0 }, // اكتب هنا اسم المنتخب 58 | اكتب هنا عدد نقاط المنتخب 58
+        // المنتخب رقم 59
+        { id: 59, name: "منتخب 59", points: 0 }, // اكتب هنا اسم المنتخب 59 | اكتب هنا عدد نقاط المنتخب 59
+        // المنتخب رقم 60
+        { id: 60, name: "منتخب 60", points: 0 }, // اكتب هنا اسم المنتخب 60 | اكتب هنا عدد نقاط المنتخب 60
+        // المنتخب رقم 61
+        { id: 61, name: "منتخب 61", points: 0 }, // اكتب هنا اسم المنتخب 61 | اكتب هنا عدد نقاط المنتخب 61
+        // المنتخب رقم 62
+        { id: 62, name: "منتخب 62", points: 0 }, // اكتب هنا اسم المنتخب 62 | اكتب هنا عدد نقاط المنتخب 62
+        // المنتخب رقم 63
+        { id: 63, name: "منتخب 63", points: 0 }, // اكتب هنا اسم المنتخب 63 | اكتب هنا عدد نقاط المنتخب 63
+        // المنتخب رقم 64
+        { id: 64, name: "منتخب 64", points: 0 }, // اكتب هنا اسم المنتخب 64 | اكتب هنا عدد نقاط المنتخب 64
+        // المنتخب رقم 65
+        { id: 65, name: "منتخب 65", points: 0 }, // اكتب هنا اسم المنتخب 65 | اكتب هنا عدد نقاط المنتخب 65
+        // المنتخب رقم 66
+        { id: 66, name: "منتخب 66", points: 0 }, // اكتب هنا اسم المنتخب 66 | اكتب هنا عدد نقاط المنتخب 66
+        // المنتخب رقم 67
+        { id: 67, name: "منتخب 67", points: 0 }, // اكتب هنا اسم المنتخب 67 | اكتب هنا عدد نقاط المنتخب 67
+        // المنتخب رقم 68
+        { id: 68, name: "منتخب 68", points: 0 }, // اكتب هنا اسم المنتخب 68 | اكتب هنا عدد نقاط المنتخب 68
+        // المنتخب رقم 69
+        { id: 69, name: "منتخب 69", points: 0 }, // اكتب هنا اسم المنتخب 69 | اكتب هنا عدد نقاط المنتخب 69
+        // المنتخب رقم 70
+        { id: 70, name: "منتخب 70", points: 0 }, // اكتب هنا اسم المنتخب 70 | اكتب هنا عدد نقاط المنتخب 70
+        // المنتخب رقم 71
+        { id: 71, name: "منتخب 71", points: 0 }, // اكتب هنا اسم المنتخب 71 | اكتب هنا عدد نقاط المنتخب 71
+        // المنتخب رقم 72
+        { id: 72, name: "منتخب 72", points: 0 }, // اكتب هنا اسم المنتخب 72 | اكتب هنا عدد نقاط المنتخب 72
+        // المنتخب رقم 73
+        { id: 73, name: "منتخب 73", points: 0 }, // اكتب هنا اسم المنتخب 73 | اكتب هنا عدد نقاط المنتخب 73
+        // المنتخب رقم 74
+        { id: 74, name: "منتخب 74", points: 0 }, // اكتب هنا اسم المنتخب 74 | اكتب هنا عدد نقاط المنتخب 74
+        // المنتخب رقم 75
+        { id: 75, name: "منتخب 75", points: 0 }, // اكتب هنا اسم المنتخب 75 | اكتب هنا عدد نقاط المنتخب 75
+        // المنتخب رقم 76
+        { id: 76, name: "منتخب 76", points: 0 }, // اكتب هنا اسم المنتخب 76 | اكتب هنا عدد نقاط المنتخب 76
+        // المنتخب رقم 77
+        { id: 77, name: "منتخب 77", points: 0 }, // اكتب هنا اسم المنتخب 77 | اكتب هنا عدد نقاط المنتخب 77
+        // المنتخب رقم 78
+        { id: 78, name: "منتخب 78", points: 0 }, // اكتب هنا اسم المنتخب 78 | اكتب هنا عدد نقاط المنتخب 78
+        // المنتخب رقم 79
+        { id: 79, name: "منتخب 79", points: 0 }, // اكتب هنا اسم المنتخب 79 | اكتب هنا عدد نقاط المنتخب 79
+        // المنتخب رقم 80
+        { id: 80, name: "منتخب 80", points: 0 }, // اكتب هنا اسم المنتخب 80 | اكتب هنا عدد نقاط المنتخب 80
+        // المنتخب رقم 81
+        { id: 81, name: "منتخب 81", points: 0 }, // اكتب هنا اسم المنتخب 81 | اكتب هنا عدد نقاط المنتخب 81
+        // المنتخب رقم 82
+        { id: 82, name: "منتخب 82", points: 0 }, // اكتب هنا اسم المنتخب 82 | اكتب هنا عدد نقاط المنتخب 82
+        // المنتخب رقم 83
+        { id: 83, name: "منتخب 83", points: 0 }, // اكتب هنا اسم المنتخب 83 | اكتب هنا عدد نقاط المنتخب 83
+        // المنتخب رقم 84
+        { id: 84, name: "منتخب 84", points: 0 }, // اكتب هنا اسم المنتخب 84 | اكتب هنا عدد نقاط المنتخب 84
+        // المنتخب رقم 85
+        { id: 85, name: "منتخب 85", points: 0 }, // اكتب هنا اسم المنتخب 85 | اكتب هنا عدد نقاط المنتخب 85
+        // المنتخب رقم 86
+        { id: 86, name: "منتخب 86", points: 0 }, // اكتب هنا اسم المنتخب 86 | اكتب هنا عدد نقاط المنتخب 86
+        // المنتخب رقم 87
+        { id: 87, name: "منتخب 87", points: 0 }, // اكتب هنا اسم المنتخب 87 | اكتب هنا عدد نقاط المنتخب 87
+        // المنتخب رقم 88
+        { id: 88, name: "منتخب 88", points: 0 }, // اكتب هنا اسم المنتخب 88 | اكتب هنا عدد نقاط المنتخب 88
+        // المنتخب رقم 89
+        { id: 89, name: "منتخب 89", points: 0 }, // اكتب هنا اسم المنتخب 89 | اكتب هنا عدد نقاط المنتخب 89
+        // المنتخب رقم 90
+        { id: 90, name: "منتخب 90", points: 0 }, // اكتب هنا اسم المنتخب 90 | اكتب هنا عدد نقاط المنتخب 90
+        // المنتخب رقم 91
+        { id: 91, name: "منتخب 91", points: 0 }, // اكتب هنا اسم المنتخب 91 | اكتب هنا عدد نقاط المنتخب 91
+        // المنتخب رقم 92
+        { id: 92, name: "منتخب 92", points: 0 }, // اكتب هنا اسم المنتخب 92 | اكتب هنا عدد نقاط المنتخب 92
+        // المنتخب رقم 93
+        { id: 93, name: "منتخب 93", points: 0 }, // اكتب هنا اسم المنتخب 93 | اكتب هنا عدد نقاط المنتخب 93
+        // المنتخب رقم 94
+        { id: 94, name: "منتخب 94", points: 0 }, // اكتب هنا اسم المنتخب 94 | اكتب هنا عدد نقاط المنتخب 94
+        // المنتخب رقم 95
+        { id: 95, name: "منتخب 95", points: 0 }, // اكتب هنا اسم المنتخب 95 | اكتب هنا عدد نقاط المنتخب 95
+        // المنتخب رقم 96
+        { id: 96, name: "منتخب 96", points: 0 }, // اكتب هنا اسم المنتخب 96 | اكتب هنا عدد نقاط المنتخب 96
+        // المنتخب رقم 97
+        { id: 97, name: "منتخب 97", points: 0 }, // اكتب هنا اسم المنتخب 97 | اكتب هنا عدد نقاط المنتخب 97
+        // المنتخب رقم 98
+        { id: 98, name: "منتخب 98", points: 0 }, // اكتب هنا اسم المنتخب 98 | اكتب هنا عدد نقاط المنتخب 98
+        // المنتخب رقم 99
+        { id: 99, name: "منتخب 99", points: 0 }, // اكتب هنا اسم المنتخب 99 | اكتب هنا عدد نقاط المنتخب 99
+        // المنتخب رقم 100
+        { id: 100, name: "منتخب 100", points: 0 }  // اكتب هنا اسم المنتخب 100 | اكتب هنا عدد نقاط المنتخب 100
+    ];
+
+    // 2. قائمة اللاعبين (اختياري) - أضف من تريد بنفس الطريقة
+    let players = [
+        // مثال: { id: 1, name: "محمد صلاح", teamId: 1, goals: 5 },   // teamId = رقم المنتخب من 1 إلى 100
+        // { id: 2, name: "سالم الدوسري", teamId: 2, goals: 3 }
+    ];
+
+    // ========== لا تقم بتعديل أي شيء تحت هذا السطر ==========
+    function renderLeaderboard() {
+        const sorted = [...teams].sort((a,b) => b.points - a.points);
+        const tbody = document.getElementById("leaderboard-body");
+        if (!tbody) return;
+        tbody.innerHTML = "";
+        sorted.forEach((team, idx) => {
+            const row = `<tr>
+                <td class="rank">${idx+1}</td>
+                <td><i class="fas fa-flag-checkered"></i> ${escapeHtml(team.name)}</td>
+                <td><span class="points">${team.points}</span></td>
+            </tr>`;
+            tbody.insertAdjacentHTML('beforeend', row);
+        });
+    }
+
+    function renderScorers() {
+        const sorted = [...players].sort((a,b) => b.goals - a.goals);
+        const tbody = document.getElementById("scorers-body");
+        if (!tbody) return;
+        if (sorted.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4">لا يوجد لاعبون، قم بإضافتهم في الكود (مصفوفة players)</td></tr>';
+            document.getElementById("total-players").innerText = "0";
+            return;
+        }
+        tbody.innerHTML = "";
+        sorted.forEach((player, idx) => {
+            const team = teams.find(t => t.id === player.teamId);
+            const teamName = team ? team.name : "غير محدد";
+            const row = `<tr>
+                <td class="rank">${idx+1}</td>
+                <td><i class="fas fa-user"></i> ${escapeHtml(player.name)}</td>
+                <td><i class="fas fa-shield-alt"></i> ${escapeHtml(teamName)}</td>
+                <td><span class="points">⚽ ${player.goals}</span></td>
+            </tr>`;
+            tbody.insertAdjacentHTML('beforeend', row);
+        });
+        document.getElementById("total-players").innerText = players.length;
+    }
+
+    function escapeHtml(str) {
+        if (!str) return "";
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    function simulateDownload() {
+        let currentStep = 0;
+        const totalSteps = 100;
+        const interval = setInterval(() => {
+            currentStep++;
+            const percent = currentStep;
+            const progressBar = document.getElementById("progress-bar");
+            const percentText = document.getElementById("progress-percent");
+            if (progressBar) progressBar.style.width = percent + "%";
+            if (percentText) percentText.innerText = percent + "%";
+            if (currentStep >= totalSteps) {
+                clearInterval(interval);
+                const loadingScreen = document.getElementById("loading-screen");
+                const mainContent = document.getElementById("main-content");
+                if (loadingScreen && mainContent) {
+                    loadingScreen.style.opacity = "0";
+                    setTimeout(() => {
+                        loadingScreen.style.display = "none";
+                        mainContent.style.display = "block";
+                        setTimeout(() => { mainContent.style.opacity = "1"; }, 50);
+                    }, 500);
+                }
+            }
+        }, 40);
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+        renderLeaderboard();
+        renderScorers();
+        simulateDownload();
+    });
+</script>
+</body>
+</html>
